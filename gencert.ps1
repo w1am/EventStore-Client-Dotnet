@@ -7,13 +7,13 @@ New-Item -ItemType Directory -Path .\certs -Force
 icacls .\certs /grant:r "$($env:UserName):(OI)(CI)RX"
 
 # Pull the Docker image
-docker pull eventstore/es-gencert-cli:1.0.2
+docker pull ghcr.io/eventstore/es-gencert-cli:1.3.0
 
 # Create CA certificate
-docker run --rm --volume ${PWD}\certs:/tmp --user (Get-Process -Id $PID).SessionId eventstore/es-gencert-cli:1.0.2 create-ca -out /tmp/ca
+docker run --rm --volume ${PWD}\certs:/tmp --user (Get-Process -Id $PID).SessionId ghcr.io/eventstore/es-gencert-cli:1.3.0 create-ca -out /tmp/ca
 
 # Create node certificate
-docker run --rm --volume ${PWD}\certs:/tmp --user (Get-Process -Id $PID).SessionId eventstore/es-gencert-cli:1.0.2 create-node -ca-certificate /tmp/ca/ca.crt -ca-key /tmp/ca/ca.key -out /tmp/node -ip-addresses 127.0.0.1 -dns-names localhost
+docker run --rm --volume ${PWD}\certs:/tmp --user (Get-Process -Id $PID).SessionId ghcr.io/eventstore/es-gencert-cli:1.3.0 create-node -ca-certificate /tmp/ca/ca.crt -ca-key /tmp/ca/ca.key -out /tmp/node -ip-addresses 127.0.0.1 -dns-names localhost
 
 # Set permissions recursively for the directory
 icacls .\certs /grant:r "$($env:UserName):(OI)(CI)RX"

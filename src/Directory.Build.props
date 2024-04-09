@@ -4,7 +4,7 @@
         <RootNamespace>EventStore.Client</RootNamespace>
     </PropertyGroup>
 
-    <PropertyGroup Condition="$(MSBuildProjectName) != 'EventStore.Client'">
+    <PropertyGroup Condition="$(MSBuildProjectName) != 'EventStore.Client' And $(MSBuildProjectName) != 'EventStore.Client.Extensions.OpenTelemetry'">
         <ESPackageIdSuffix>$(MSBuildProjectName.Remove(0,18))</ESPackageIdSuffix>
         <ESProto>$(ESPackageIdSuffix.ToLower()).proto</ESProto>
         <ESProtoPath>../EventStore.Client.Common/protos/$(ESProto)</ESProtoPath>
@@ -48,6 +48,10 @@
 
     <ItemGroup>
         <Compile Include="../EventStore.Client.Common/**/*.cs" Link="Common\%(RecursiveDir)/%(FileName)%(Extension)"/>
+    </ItemGroup>
+
+    <ItemGroup Condition="$(MSBuildProjectName) == 'EventStore.Client.Streams' Or $(MSBuildProjectName) == 'EventStore.Client.PersistentSubscriptions'">
+    	<Compile Include="../EventStore.Client/Diagnostics/**/*.cs" Link="Diagnostics\%(RecursiveDir)/%(FileName)%(Extension)"/>
     </ItemGroup>
 
     <ItemGroup>

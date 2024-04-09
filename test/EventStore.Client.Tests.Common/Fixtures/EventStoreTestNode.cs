@@ -33,7 +33,7 @@ public class EventStoreTestNode(EventStoreFixtureOptions? options = null) : Test
 
 		var defaultEnvironment = new Dictionary<string, string?>(GlobalEnvironment.Variables) {
 			["EVENTSTORE_MEM_DB"]                           = "true",
-			["EVENTSTORE_CHUNK_SIZE"]                       = (1024 * 1024).ToString(),
+			["EVENTSTORE_CHUNK_SIZE"]                       = (1024 * 1024 * 1024).ToString(),
 			["EVENTSTORE_CERTIFICATE_FILE"]                 = "/etc/eventstore/certs/node/node.crt",
 			["EVENTSTORE_CERTIFICATE_PRIVATE_KEY_FILE"]     = "/etc/eventstore/certs/node/node.key",
 			["EVENTSTORE_STREAM_EXISTENCE_FILTER_SIZE"]     = "10000",
