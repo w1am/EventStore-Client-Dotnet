@@ -64,11 +64,21 @@ jobs:
         with:
           name: certs
           path: certs
+      - name: Import certificates (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo cp certs/ca/ca.crt /usr/local/share/ca-certificates/eventstore_ca.crt
+          sudo update-ca-certificates
+      - name: Import certificates (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Import-Certificate -FilePath "certs\ca\ca.crt" -CertStoreLocation "Cert:\LocalMachine\Root"
       - name: Run Tests (Linux)
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          sudo ./gencert.sh
           dotnet test --configuration ${{ matrix.configuration }} --blame \
             --logger:"GitHubActions;report-warnings=false" --logger:"console;verbosity=normal" \
             --framework ${{ matrix.framework }} \
@@ -77,7 +87,6 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Import-Certificate -FilePath "certs\ca\ca.crt" -CertStoreLocation "Cert:\LocalMachine\Root"
           dotnet test --configuration ${{ matrix.configuration }} --blame `
             --logger:"GitHubActions;report-warnings=false" --logger:"console;verbosity=normal" `
             --framework ${{ matrix.framework }} `
