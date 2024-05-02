@@ -36,7 +36,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        framework: [ net6.0, net7.0, net8.0 ]
+        framework: [ net8.0 ]
         os: [ windows-latest ]
         test: [ Streams, PersistentSubscriptions, Operations, UserManagement, ProjectionManagement ]
         configuration: [ release ]
@@ -44,10 +44,14 @@ jobs:
     name: EventStore.Client.${{ matrix.test }}/${{ matrix.os }}/${{ matrix.framework }}/${{ inputs.docker-tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - shell: bash
         run: |
           git fetch --prune --unshallow
+      - name: Pull EventStore Image
+        shell: bash
+        run: |
+          docker pull docker.eventstore.com/eventstore-ce/eventstoredb-ce:${{ inputs.docker-tag }}
       - name: Install dotnet SDKs
         uses: actions/setup-dotnet@v3
         with:
@@ -64,12 +68,6 @@ jobs:
         with:
           name: certs
           path: certs
-      - name: Import certificates (Linux)
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          sudo cp certs/ca/ca.crt /usr/local/share/ca-certificates/eventstore_ca.crt
-          sudo update-ca-certificates
       - name: Import certificates (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
