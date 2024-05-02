@@ -48,6 +48,12 @@ jobs:
       - shell: bash
         run: |
           git fetch --prune --unshallow
+      - name: Install WSL
+        if: runner.os == 'Windows'
+        run: |
+          dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+          dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+        shell: pwsh
       - name: Check WSL Version
         if: runner.os == 'Windows'
         run: wsl --list --verbose
