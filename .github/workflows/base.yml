@@ -59,16 +59,16 @@ jobs:
         run: |
           wsl --update
         shell: pwsh
-      - name: Install Ubuntu on WSL
-        if: runner.os == 'Windows'
-        run: |
-          wsl --install -d Ubuntu
-        shell: pwsh
-      - name: Switch to Ubuntu
-        if: runner.os == 'Windows'
-        run: |
-          wsl --set-default Ubuntu
-        shell: pwsh
+#      - name: Install Ubuntu on WSL
+#        if: runner.os == 'Windows'
+#        run: |
+#          wsl --install -d Ubuntu
+#        shell: pwsh
+#      - name: Switch to Ubuntu
+#        if: runner.os == 'Windows'
+#        run: |
+#          wsl --set-default Ubuntu
+#        shell: pwsh
       - name: Pull EventStore Image
         shell: bash
         run: |
