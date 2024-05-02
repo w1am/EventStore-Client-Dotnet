@@ -54,10 +54,15 @@ jobs:
           dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
           dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
         shell: pwsh
-      - name: Install WSL
+      - name: Update WSL
         if: runner.os == 'Windows'
         run: |
           wsl --update
+        shell: pwsh
+      - name: Print WSL version
+        if: runner.os == 'Windows'
+        run: |
+          wsl --list --verbose
         shell: pwsh
 #      - name: Install Ubuntu on WSL
 #        if: runner.os == 'Windows'
