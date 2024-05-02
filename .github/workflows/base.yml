@@ -54,9 +54,20 @@ jobs:
           dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
           dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
         shell: pwsh
-      - name: Check WSL Version
+      - name: Install WSL
         if: runner.os == 'Windows'
-        run: wsl --list --verbose
+        run: |
+          wsl --update
+        shell: pwsh
+      - name: Install Ubuntu on WSL
+        if: runner.os == 'Windows'
+        run: |
+          wsl --install -d Ubuntu
+        shell: pwsh
+      - name: Switch to Ubuntu
+        if: runner.os == 'Windows'
+        run: |
+          wsl --set-default Ubuntu
         shell: pwsh
       - name: Pull EventStore Image
         shell: bash
