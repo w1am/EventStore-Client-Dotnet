@@ -81,7 +81,7 @@ jobs:
         env:
           ES_DOCKER_TAG: ${{ inputs.docker-tag }}
         run: |
-          dotnet test --configuration ${{ matrix.configuration }} --blame \
-            --logger:"GitHubActions;report-warnings=false" --logger:"console;verbosity=normal" \
-            --framework ${{ matrix.framework }} \
+          dotnet test --configuration ${{ matrix.configuration }} --blame `
+            --logger:"GitHubActions;report-warnings=false" --logger:"console;verbosity=normal" `
+            --framework ${{ matrix.framework }} `
             test/EventStore.Client.${{ matrix.test }}.Tests
