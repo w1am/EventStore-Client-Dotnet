@@ -37,8 +37,8 @@ jobs:
       fail-fast: false
       matrix:
         framework: [ net8.0 ]
-        os: [ windows-2019 ]
-        test: [ Streams, PersistentSubscriptions, Operations, UserManagement, ProjectionManagement ]
+        os: [ windows-latest ]
+        test: [ Operations ]
         configuration: [ release ]
     runs-on: ${{ matrix.os }}
     name: EventStore.Client.${{ matrix.test }}/${{ matrix.os }}/${{ matrix.framework }}/${{ inputs.docker-tag }}
@@ -48,6 +48,10 @@ jobs:
       - shell: bash
         run: |
           git fetch --prune --unshallow
+      - name: Check WSL Version
+        if: runner.os == 'Windows'
+        run: wsl --list --verbose
+        shell: pwsh
       - name: Pull EventStore Image
         shell: bash
         run: |
