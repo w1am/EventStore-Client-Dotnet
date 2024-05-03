@@ -59,11 +59,21 @@ jobs:
         run: |
           wsl --update
         shell: pwsh
-      - name: Print WSL version
-        if: runner.os == 'Windows'
+      - name: Setup WSL2 with Ubuntu
         run: |
-          wsl --list --verbose
+          wsl --install -d Ubuntu
+          wsl --set-default Ubuntu
         shell: pwsh
+
+      - name: Pull and Run Docker in WSL2
+        run: |
+          wsl -- bash -c "docker pull docker.eventstore.com/eventstore-ce/eventstoredb-ce:${{ inputs.docker-tag }} && docker run ..."
+        shell: pwsh
+#      - name: Print WSL version
+#        if: runner.os == 'Windows'
+#        run: |
+#          wsl --list --verbose
+#        shell: pwsh
 #      - name: Install Ubuntu on WSL
 #        if: runner.os == 'Windows'
 #        run: |
@@ -74,10 +84,10 @@ jobs:
 #        run: |
 #          wsl --set-default Ubuntu
 #        shell: pwsh
-      - name: Pull EventStore Image
-        shell: bash
-        run: |
-          docker pull docker.eventstore.com/eventstore-ce/eventstoredb-ce:${{ inputs.docker-tag }}
+#      - name: Pull EventStore Image
+#        shell: bash
+#        run: |
+#          docker pull docker.eventstore.com/eventstore-ce/eventstoredb-ce:${{ inputs.docker-tag }}
       - name: Install dotnet SDKs
         uses: actions/setup-dotnet@v3
         with:
