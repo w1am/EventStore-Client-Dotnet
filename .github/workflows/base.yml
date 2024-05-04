@@ -8,8 +8,19 @@ on:
         type: string
 
 jobs:
+  pull-eventstoredb:
+    name: Pull Docker EventStoreDB
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull and Start EventStoreDB Docker Container
+        run: |
+          docker pull docker.eventstore.com/eventstore-ce/eventstoredb-ce:latest
+          docker run -d -p 2113:2113 -p 1113:1113 --name eventstore docker.eventstore.com/eventstore-ce/eventstoredb-ce:latest
+
   generate-certificates:
     runs-on: ubuntu-latest
+    needs: pull-eventstoredb
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -32,86 +43,40 @@ jobs:
 
   test:
     needs: generate-certificates
+    runs-on: windows-latest
     timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        framework: [ net8.0 ]
-        os: [ windows-latest ]
+        framework: [ net48 ]
         test: [ Operations ]
         configuration: [ release ]
-    runs-on: ${{ matrix.os }}
-    name: EventStore.Client.${{ matrix.test }}/${{ matrix.os }}/${{ matrix.framework }}/${{ inputs.docker-tag }}
+    name: EventStore.Client.${{ matrix.test }}/${{ matrix.framework }}/${{ inputs.docker-tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - shell: bash
-        run: |
-          git fetch --prune --unshallow
-      - name: Install WSL
-        if: runner.os == 'Windows'
-        run: |
-          dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
-          dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
-        shell: pwsh
-      - name: Update WSL
-        if: runner.os == 'Windows'
-        run: |
-          wsl --update
-        shell: pwsh
-      - name: Setup WSL2 with Ubuntu
-        run: |
-          wsl --install -d Ubuntu
-          wsl --set-default Ubuntu
-        shell: pwsh
-
-      - name: Pull and Run Docker in WSL2
-        run: |
-          wsl -- bash -c "docker pull docker.eventstore.com/eventstore-ce/eventstoredb-ce:${{ inputs.docker-tag }} && docker run ..."
-        shell: pwsh
-#      - name: Print WSL version
-#        if: runner.os == 'Windows'
-#        run: |
-#          wsl --list --verbose
-#        shell: pwsh
-#      - name: Install Ubuntu on WSL
-#        if: runner.os == 'Windows'
-#        run: |
-#          wsl --install -d Ubuntu
-#        shell: pwsh
-#      - name: Switch to Ubuntu
-#        if: runner.os == 'Windows'
-#        run: |
-#          wsl --set-default Ubuntu
-#        shell: pwsh
-#      - name: Pull EventStore Image
-#        shell: bash
-#        run: |
-#          docker pull docker.eventstore.com/eventstore-ce/eventstoredb-ce:${{ inputs.docker-tag }}
-      - name: Install dotnet SDKs
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: |
-            8.0.x
+        uses: actions/checkout@v2
       - name: Compile
         shell: bash
         run: |
           dotnet build --configuration ${{ matrix.configuration }} --framework ${{ matrix.framework }} src/EventStore.Client.${{ matrix.test }}
+
       - name: Download certificates
         uses: actions/download-artifact@v2
         with:
           name: certs
           path: certs
+
       - name: Import certificates (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           Import-Certificate -FilePath "certs\ca\ca.crt" -CertStoreLocation "Cert:\LocalMachine\Root"
-      - name: Run Tests (Windows)
-        if: runner.os == 'Windows'
+
+      - name: Run Tests
         shell: pwsh
         env:
           ES_DOCKER_TAG: ${{ inputs.docker-tag }}
+          EVENTSTORE_DB_HOST: 127.0.0.1
         run: |
           dotnet test --configuration ${{ matrix.configuration }} --blame `
             --logger:"GitHubActions;report-warnings=false" --logger:"console;verbosity=normal" `
