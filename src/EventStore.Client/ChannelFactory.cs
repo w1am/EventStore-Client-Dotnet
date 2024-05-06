@@ -47,11 +47,13 @@ namespace EventStore.Client {
 
 			var configureClientCert = settings.ConnectivitySettings is { Insecure: false } && certificate != null;
 
-			var handler = new WinHttpHandler {
-				TcpKeepAliveEnabled = true,
-				TcpKeepAliveTime = settings.ConnectivitySettings.KeepAliveTimeout,
-				TcpKeepAliveInterval = settings.ConnectivitySettings.KeepAliveInterval,
-				EnableMultipleHttp2Connections = true
+			// var handler = new WinHttpHandler {
+			// 	TcpKeepAliveEnabled = true,
+			// 	TcpKeepAliveTime = settings.ConnectivitySettings.KeepAliveTimeout,
+			// 	TcpKeepAliveInterval = settings.ConnectivitySettings.KeepAliveInterval,
+			// 	EnableMultipleHttp2Connections = true
+			// };
+			var handler = new HttpClientHandler {
 			};
 
 			if (settings.ConnectivitySettings.Insecure) return handler;
@@ -61,7 +63,7 @@ namespace EventStore.Client {
 			}
 
 			if (!settings.ConnectivitySettings.TlsVerifyCert) {
-				handler.ServerCertificateValidationCallback = delegate { return true; };
+				handler.ServerCertificateCustomValidationCallback = delegate { return true; };
 			}
 
 			return handler;

@@ -29,8 +29,8 @@ public class EventStoreTestServerCluster : IEventStoreTestServer {
 			BaseAddress = address,
 		};
 #else
-		_httpClient = new HttpClient(new WinHttpHandler {
-			ServerCertificateValidationCallback =  delegate { return true; }
+		_httpClient = new HttpClient(new HttpClientHandler {
+			ServerCertificateCustomValidationCallback =  delegate { return true; }
 		}) {
 			BaseAddress = address,
 		};

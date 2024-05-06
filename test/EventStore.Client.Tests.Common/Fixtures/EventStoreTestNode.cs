@@ -90,7 +90,9 @@ public class EventStoreTestNode(EventStoreFixtureOptions? options = null) : Test
 #if NET
 			new SocketsHttpHandler { SslOptions = { RemoteCertificateValidationCallback = delegate { return true; } } }
 #else
-            new WinHttpHandler { ServerCertificateValidationCallback = delegate { return true; } }
+			new HttpClientHandler {
+				ServerCertificateCustomValidationCallback = delegate { return true; }
+			}
 #endif
 		) {
 			BaseAddress = Options.ClientSettings.ConnectivitySettings.Address
